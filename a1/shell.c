@@ -14,17 +14,28 @@ int main(int argc, char const *argv[]) {
   int shouldRun = 1; // flag to determine when to exit program
   while (shouldRun) {
     memset(args, 0, sizeof(args)); // Clear input before retrieving it again
+
     printf("osh> ");
     fflush(stdout);
     fgets(input, sizeof(input), stdin);
     input[strcspn(input, "\n")] = '\0'; // Strip newline from input since it is a pain
+
     if (strcmp(input, "exit") == 0) {
       shouldRun = 0;
       continue;
     }
+
     token = strtok(input, " ");
     int i = 0;
-    while (token != NULL) {
+    int bgFlag = 0;
+    while (1) {
+      if (token == NULL) {
+        if (i != 0 && strcmp(args[i - 1], "&") == 0) {
+          bgFlag = 1;
+          args[i - 1] = NULL;
+        }
+        break;
+      }
       args[i] = strdup(token);
       token = strtok(NULL, " ");
       ++i;
@@ -36,10 +47,11 @@ int main(int argc, char const *argv[]) {
       fprintf(stderr, "Fork Failed!\n");
       return 1;
     } else if (pid == 0) {
-      printf("CHILD\n");
       execvp(args[0], args);
     } else {
-      wait(NULL);
+      if (!bgFlag) {
+        wait(NULL);
+      }
     }
   }
   return 0;
