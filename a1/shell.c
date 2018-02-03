@@ -10,6 +10,7 @@ int main(int argc, char const *argv[]) {
   char input[MAX_SIZE];
   char * args[MAX_SIZE]; // command line arguments
   char * token;
+  int bgFlag = 0;
 
   int shouldRun = 1; // flag to determine when to exit program
   while (shouldRun) {
@@ -27,12 +28,13 @@ int main(int argc, char const *argv[]) {
 
     token = strtok(input, " ");
     int i = 0;
-    int bgFlag = 0;
     while (1) {
       if (token == NULL) {
         if (i != 0 && strcmp(args[i - 1], "&") == 0) {
           bgFlag = 1;
           args[i - 1] = NULL;
+        } else {
+          bgFlag = 0;
         }
         break;
       }
@@ -45,14 +47,18 @@ int main(int argc, char const *argv[]) {
     pid = fork();
     if (pid < 0) {
       fprintf(stderr, "Fork Failed!\n");
-      return 1;
+      return EXIT_FAILURE;
     } else if (pid == 0) {
-      execvp(args[0], args);
+      int error = execvp(args[0], args);
+      if (error == -1) {
+        printf("Invalid Command!\n");
+        return EXIT_FAILURE;
+      }
     } else {
       if (!bgFlag) {
         wait(NULL);
       }
     }
   }
-  return 0;
+  return EXIT_SUCCESS;
 }
