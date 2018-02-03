@@ -1,6 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
+#include <ctype.h>
+
+bool isInt(char const integer[]) {
+  int i = 0;
+  if (integer[0] == '-') {
+    i = 1;
+  }
+  for (size_t i = 0; integer[i] != 0; i++) {
+    if (!isdigit(integer[i])) {
+      return false;
+    }
+  }
+  return true;
+}
 
 void collatz(int n) {
   /**
@@ -22,15 +37,15 @@ void collatz(int n) {
 
 int main(int argc, char const *argv[]) {
 
-  if (argc != 2) {
-    puts("Please provide one argument!");
+  if (argc != 2 || !isInt(argv[1])) {
+    puts("Please provide one integer argument!");
     return 1;
   }
 
   int startNum = atoi(argv[1]);
 
   if (startNum < 0) {
-    printf("Please only supply one positive number as an argument!\n");
+    printf("Please supply a positive number as an argument!\n");
     return 1;
   }
 
