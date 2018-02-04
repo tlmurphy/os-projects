@@ -56,11 +56,9 @@ int main(int argc, char const *argv[]) {
     fprintf(stderr, "Fork Failed!\n");
     return 1;
   } else if (pid == 0) {
-    printf("Child Process Executing\n");
     collatz(startNum);
   } else {
     wait(NULL);
-    printf("Child Complete\n");
   }
   return 0;
 }

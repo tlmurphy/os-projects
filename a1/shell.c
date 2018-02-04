@@ -17,11 +17,12 @@ int main(int argc, char const *argv[]) {
     memset(args, 0, sizeof(args)); // Clear input before retrieving it again
 
     printf("osh> ");
+
     fflush(stdout);
     fgets(input, sizeof(input), stdin);
     input[strcspn(input, "\n")] = '\0'; // Strip newline from input since it is a pain
 
-    if (strcmp(input, "exit") == 0) {
+    if (!strcmp(input, "exit")) {
       shouldRun = 0;
       continue;
     }
@@ -30,9 +31,9 @@ int main(int argc, char const *argv[]) {
     int i = 0;
     while (1) {
       if (token == NULL) {
-        if (i != 0 && strcmp(args[i - 1], "&") == 0) {
+        if (i != 0 && !strcmp(args[i - 1], "&")) {
           bgFlag = 1;
-          args[i - 1] = NULL;
+          args[i - 1] = NULL; // Remove '&' since we don't need it for the command
         } else {
           bgFlag = 0;
         }
@@ -49,10 +50,11 @@ int main(int argc, char const *argv[]) {
       fprintf(stderr, "Fork Failed!\n");
       return EXIT_FAILURE;
     } else if (pid == 0) {
+      execvp(args[0], args);
       int error = execvp(args[0], args);
       if (error == -1) {
         printf("Invalid Command!\n");
-        return EXIT_FAILURE;
+        return EXIT_FAILURE; // Need to exit child if command is a failure
       }
     } else {
       if (!bgFlag) {
