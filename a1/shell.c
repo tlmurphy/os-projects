@@ -105,7 +105,7 @@ int main(int argc, char const *argv[]) {
       }
     } else {
       if (!bgFlag) {
-        wait(NULL);
+        waitpid(pid, NULL, 0);
       }
     }
   }
