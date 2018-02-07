@@ -8,6 +8,7 @@
 #define MAX_SIZE MAX_LINE / 2 + 1
 
 void getInput(char *input) {
+  fflush(stdout);
   fgets(input, MAX_SIZE, stdin);
   input[strcspn(input, "\n")] = '\0'; // Strip newline from input since it is a pain
 }
@@ -93,7 +94,7 @@ void executeProcess(char **args, int bgFlag) {
     execvp(args[0], args);
     int error = execvp(args[0], args);
     if (error == -1) {
-      printf("Invalid Command!\n");
+      puts("Invalid Command!");
       exit(EXIT_FAILURE); // Need to exit child if command is a failure
     }
   } else {
@@ -112,7 +113,6 @@ int main(int argc, char const *argv[]) {
     char input[MAX_SIZE] = {};
     char * args[MAX_SIZE] = {}; // command line arguments
     printf("osh> ");
-    fflush(stdout);
     getInput(input);
     if (processCommand(input, commandHistory, &commandCount, &shouldRun) == 1) {
       // Skip to next prompt
