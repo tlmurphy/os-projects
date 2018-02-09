@@ -20,8 +20,8 @@ int processCommand(char *input, char **commandHistory, int *commandCount, int *s
   }
 
   if (!strcmp(input, "history")) {
-    for (int i = 0; i < *commandCount; i++) {
-      printf("%d %s\n", *commandCount - i, commandHistory[i]);
+    for (int i = *commandCount - 1, j = 0; i >= 0 && j < 10; i--, j++) {
+      printf("%d %s\n", i + 1, commandHistory[i]);
     }
     return 1;
   }
@@ -46,11 +46,11 @@ int processCommand(char *input, char **commandHistory, int *commandCount, int *s
       }
       if (!badInput) {
         int n = atoi(nCommand);
-        if (n > 1000 || n == 0 || commandHistory[n - 1] == NULL) {
+        if (n > 1000 || n < 1 ||  n <= *commandCount - 10 || commandHistory[n - 1] == NULL) {
           puts("No such command in history.");
           return 1;
         }
-        strcpy(input, commandHistory[*commandCount - n]);
+        strcpy(input, commandHistory[n - 1]);
       }
     }
   }
@@ -71,6 +71,7 @@ void buildArguments(char *input, char **args, int *bgFlag) {
   while (1) {
     if (token == NULL) {
       if (i != 0 && !strcmp(args[i - 1], "&")) {
+        printf("%s\n", args[i]);
         *bgFlag = 1;
         args[i - 1] = NULL; // Remove '&' since we don't need it for the command
       } else {
