@@ -32,8 +32,10 @@ int processCommand(char *input, char **commandHistory, int *commandCount, int *s
         puts("No commands in history.");
         return 1;
       }
+      printf("%s\n", commandHistory[*commandCount - 1]);
       strcpy(input, commandHistory[*commandCount - 1]);
     } else {
+      // Nth command ex: !4
       char nCommand[20] = "";
       int badInput = 0;
       for (size_t i = 1; input[i] != '\0'; i++) {
@@ -50,6 +52,7 @@ int processCommand(char *input, char **commandHistory, int *commandCount, int *s
           puts("No such command in history.");
           return 1;
         }
+        printf("%s\n", commandHistory[n - 1]);
         strcpy(input, commandHistory[n - 1]);
       }
     }
@@ -69,18 +72,23 @@ void buildArguments(char *input, char **args, int *bgFlag) {
   char *token = strtok(input, " ");
   int i = 0;
   while (1) {
+    args[i] = strdup(token);
+    token = strtok(NULL, " ");
     if (token == NULL) {
-      if (i != 0 && !strcmp(args[i - 1], "&")) {
-        printf("%s\n", args[i]);
+      if (!strcmp(args[i], "&")) {
         *bgFlag = 1;
-        args[i - 1] = NULL; // Remove '&' since we don't need it for the command
-      } else {
+        args[i] = NULL; // Remove '&' since we don't need it for the command
+      } else if (args[i][(strlen(args[i]) - 1)] == '&') {
+        // Checking if last character of the last token is '&'
+        // In normal shells, something like sleep 2& would work as well as sleep 2 &
+        *bgFlag = 1;
+        args[i][(strlen(args[i]) - 1)] = '\0';
+      }
+      else {
         *bgFlag = 0;
       }
       break;
     }
-    args[i] = strdup(token);
-    token = strtok(NULL, " ");
     ++i;
   }
 }
@@ -106,13 +114,13 @@ void executeProcess(char **args, int bgFlag) {
 }
 
 int main(int argc, char const *argv[]) {
-  char * commandHistory[1000] = {}; // Surely 1000 commands is enough...
+  char *commandHistory[1000] = {}; // Surely 1000 commands is enough...
   int bgFlag = 0;
   int shouldRun = 1; // flag to determine when to exit program
   int commandCount = 0;
   while (shouldRun) {
     char input[MAX_SIZE] = {};
-    char * args[MAX_SIZE] = {}; // command line arguments
+    char *args[MAX_SIZE] = {}; // command line arguments
     printf("osh> ");
     getInput(input);
     if (processCommand(input, commandHistory, &commandCount, &shouldRun) == 1) {
