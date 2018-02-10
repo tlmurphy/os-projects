@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define MAX_LINE 80 // The maximum length command
 #define MAX_SIZE MAX_LINE / 2 + 1
