@@ -3,12 +3,10 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 bool isInt(char const integer[]) {
-  int i = 0;
-  if (integer[0] == '-') {
-    i = 1;
-  }
   for (size_t i = 0; integer[i] != 0; i++) {
     if (!isdigit(integer[i])) {
       return false;
@@ -38,7 +36,7 @@ void collatz(int n) {
 int main(int argc, char const *argv[]) {
 
   if (argc != 2 || !isInt(argv[1])) {
-    puts("Please provide one integer argument!");
+    puts("Please provide one positive integer argument!");
     return 1;
   }
 
