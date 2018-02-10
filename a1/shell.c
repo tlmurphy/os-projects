@@ -32,7 +32,7 @@ int processCommand(char *input, char **commandHistory, int *commandCount, int *s
         puts("No commands in history.");
         return 1;
       }
-      printf("%s\n", commandHistory[*commandCount - 1]);
+      puts(commandHistory[*commandCount - 1]);
       strcpy(input, commandHistory[*commandCount - 1]);
     } else {
       // Nth command ex: !4
@@ -52,7 +52,7 @@ int processCommand(char *input, char **commandHistory, int *commandCount, int *s
           puts("No such command in history.");
           return 1;
         }
-        printf("%s\n", commandHistory[n - 1]);
+        puts(commandHistory[n - 1]);
         strcpy(input, commandHistory[n - 1]);
       }
     }
