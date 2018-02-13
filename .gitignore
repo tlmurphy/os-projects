@@ -37,6 +37,9 @@
 *.hex
 shell
 collatz
+pid_manager
+test_manager
+thread_stats
 
 # Debug files
 *.dSYM/

@@ -43,7 +43,7 @@ int main(int argc, char const *argv[]) {
   int startNum = atoi(argv[1]);
 
   if (startNum < 0) {
-    printf("Please supply a positive number as an argument!\n");
+    puts("Please supply a positive number as an argument!");
     return 1;
   }
 

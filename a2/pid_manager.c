@@ -14,7 +14,7 @@ int allocate_map(void) {
 }
 
 int allocate_pid(void) {
-  for (size_t i = 300; i < MAX_PID; i++) {
+  for (size_t i = MIN_PID; i < MAX_PID; i++) {
     if (bit_map[i] == 0) {
       bit_map[i] = 1;
       return i;

@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
-// #include <sys/types.h>
-// #include <time.h>
 #include <unistd.h>
 #include "pid_manager.h"
 
@@ -15,7 +13,7 @@
 void *runner(void *param) {
   int pid = allocate_pid();
   printf("Allocated PID %d\n", pid);
-  sleep(20);
+  sleep((rand() % 20) + 1); // Random number from 1 -> 20
   release_pid(pid);
   printf("Released PID %d\n", pid);
   pthread_exit(0);
