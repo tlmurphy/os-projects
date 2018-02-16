@@ -26,11 +26,15 @@ int main(int argc, char const *argv[]) {
 
   pthread_attr_init(&attr);
   allocate_map();
-  for (size_t i = 0; i < NUM_THREADS; i++) {
+  int i = 0;
+  while (i < NUM_THREADS) {
     pthread_create(&workers[i], &attr, runner, NULL);
+    i++;
   }
-  for (size_t i = 0; i < NUM_THREADS; i++) {
+  i = 0;
+  while (i < NUM_THREADS) {
     pthread_join(workers[i], NULL);
+    i++;
   }
   return 0;
 }

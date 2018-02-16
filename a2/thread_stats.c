@@ -78,7 +78,6 @@ int main(int argc, char const *argv[]) {
   }
   nums[argc] = NULL;
 
-  srand(time(NULL));
   pthread_t avg_thread;
   pthread_t min_thread;
   pthread_t max_thread;
