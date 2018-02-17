@@ -66,6 +66,11 @@ bool isNumber(char const number[]) {
 }
 
 int main(int argc, char const *argv[]) {
+  if (argc < 2) {
+    puts("Please supply at least one argument!");
+    return -1;
+  }
+  
   char const *nums[argc];
 
   for (size_t i = 1; i < argc; i++) {
