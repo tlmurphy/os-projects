@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -g
+CFLAGS=-pthread -Wall -g
 MANAGER_OBJECTS=test_manager.o pid_manager.o
 STATS_OBJECTS=thread_stats.o pid_manager.o
 
