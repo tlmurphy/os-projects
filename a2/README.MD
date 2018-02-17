@@ -9,7 +9,7 @@ make test_manager
 To test Exercise 4.21
 ```bash
 make thread_stats
-./thread_stats 1 2 3 4 5
+./thread_stats 1 2 3 4
 ```
 
 ```bash
