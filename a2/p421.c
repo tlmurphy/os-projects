@@ -2,7 +2,6 @@
  * Exercise 4.21
  */
 
-#include "pid_manager.h"
 #include <ctype.h>
 #include <pthread.h>
 #include <stdbool.h>
@@ -10,9 +9,34 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define MIN_PID 300
+#define MAX_PID 5000
+
+int bit_map[MAX_PID];
 int avg = 0;
 int min = 0;
 int max = 0;
+
+int allocate_map(void) {
+  for (size_t i = MIN_PID; i < MAX_PID; i++) {
+    bit_map[i] = 0;
+  }
+  return 1;
+}
+
+int allocate_pid(void) {
+  for (size_t i = MIN_PID; i < MAX_PID; i++) {
+    if (bit_map[i] == 0) {
+      bit_map[i] = 1;
+      return i;
+    }
+  }
+  return -1;
+}
+
+void release_pid(int pid) {
+  bit_map[pid] = 0;
+}
 
 void *find_avg(void *param) {
   char const **nums = (char const **)param;
@@ -70,7 +94,7 @@ int main(int argc, char const *argv[]) {
     puts("Please supply at least one argument!");
     return -1;
   }
-  
+
   char const *nums[argc];
 
   for (size_t i = 1; i < argc; i++) {

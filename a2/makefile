@@ -1,16 +1,13 @@
-CC=gcc
-CFLAGS=-pthread -Wall -g
-MANAGER_OBJECTS=test_manager.o pid_manager.o
-STATS_OBJECTS=thread_stats.o pid_manager.o
+all: p320 p420 p421
 
-test_manager: $(MANAGER_OBJECTS)
-	$(CC) -o test_manager $(CFLAGS) $(MANAGER_OBJECTS)
+p320: p320.c
+	gcc -o p320 p320.c
 
-thread_stats: $(STATS_OBJECTS)
-	$(CC) -o thread_stats $(CFLAGS) $(STATS_OBJECTS)
+p420: p420.c
+	gcc p420.c -o p420 -lpthread
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $<
+p421: p421.c
+	gcc p421.c -o p421 -lpthread
 
 clean:
-	$(RM) -rf test_manager thread_stats *.o *.dSYM/
+	rm p421 p420 p320
