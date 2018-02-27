@@ -23,7 +23,7 @@ int insert_item(buffer_item item) {
     b_index++;
     return 0;
   } else {
-    return -1
+    return -1;
   }
 }
 
@@ -45,9 +45,9 @@ void *producer(void *param) {
     sem_wait(&empty);
     pthread_mutex_lock(&mutex);
     if (insert_item(item)) {
-      puts("Error on inserting item!");
+      puts("Error on inserting item, buffer is full!");
     } else {
-      printf("producer produced %d\n", item);
+      printf("Thread {} producing item %d; Buffer Size: %d\n", item, b_index);
     }
     pthread_mutex_unlock(&mutex);
     sem_post(&full);
@@ -61,9 +61,9 @@ void *consumer(void *param) {
     sem_wait(&full);
     pthread_mutex_lock(&mutex);
     if (remove_item(&item)) {
-      puts("Error on removing item!");
+      puts("Error on removing item, buffer is empty!");
     } else {
-      printf("consumer consumed %d\n", item);
+      printf("Thread {} consuming item %d; Buffer Size: %d\n", item, b_index);
     }
     pthread_mutex_unlock(&mutex);
     sem_post(&empty);
