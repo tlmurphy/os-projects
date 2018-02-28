@@ -47,7 +47,7 @@ void *producer(void *param) {
     if (insert_item(item)) {
       puts("Error on inserting item, buffer is full!");
     } else {
-      printf("Thread {} producing item %d; Buffer Size: %d\n", item, b_index);
+      printf("Thread %ld producing item %d; Buffer Size: %d\n", (long) pthread_self(), item, b_index);
     }
     pthread_mutex_unlock(&mutex);
     sem_post(&full);
@@ -63,7 +63,7 @@ void *consumer(void *param) {
     if (remove_item(&item)) {
       puts("Error on removing item, buffer is empty!");
     } else {
-      printf("Thread {} consuming item %d; Buffer Size: %d\n", item, b_index);
+      printf("Thread %ld consuming item %d; Buffer Size: %d\n", (long) pthread_self(), item, b_index);
     }
     pthread_mutex_unlock(&mutex);
     sem_post(&empty);

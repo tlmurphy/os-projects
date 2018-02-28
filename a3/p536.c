@@ -41,7 +41,7 @@ void *runner(void *param) {
   counter++;
   int pid = allocate_pid();
   int sleep_time = (rand() % 20) + 1;
-  printf("Sleeping Time: %d; Thread Id = %d; Counter Value = %d\n", sleep_time, pid, counter);
+  printf("Sleeping Time: %d; Thread Id = %ld; Counter Value = %d\n", sleep_time, (long) pthread_self(), counter);
   pthread_mutex_unlock(&mutex);
   sleep(sleep_time); // Random number from 1 -> 20
   release_pid(pid);
