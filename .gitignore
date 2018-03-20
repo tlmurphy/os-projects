@@ -42,6 +42,8 @@ p420
 p421
 p536
 pp3
+dispatcher
+process
 
 # Debug files
 *.dSYM/
