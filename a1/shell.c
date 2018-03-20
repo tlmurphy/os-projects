@@ -102,7 +102,6 @@ void executeProcess(char **args, int bgFlag) {
     fprintf(stderr, "Fork Failed!\n");
     exit(EXIT_FAILURE);
   } else if (pid == 0) {
-    execvp(args[0], args);
     int error = execvp(args[0], args);
     if (error == -1) {
       puts("Invalid Command!");
