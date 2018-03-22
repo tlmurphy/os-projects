@@ -23,17 +23,17 @@ void enqueue(Queue *q, Process *p) {
   q->back = temp;
 }
 
-void dequeue(Queue *q) {
+Node *dequeue(Queue *q) {
   Node *temp = q->front;
   if (q->front == NULL) {
     printf("Queue is Empty!\n");
-    return;
+    return NULL;
   }
   if (q->front == q->back) // Only one item left
     q->front = q->back = NULL;
   else
     q->front = q->front->next;
-  free(temp);
+  return temp;
 }
 
 void printQueue(Queue *q) {

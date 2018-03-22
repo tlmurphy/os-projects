@@ -98,8 +98,7 @@ int main(int argc, char *argv[]) {
   Node *node = NULL;
   while (nonEmpty(d) == 0 || nonEmpty(s) == 0 || nonEmpty(q1) == 0 || nonEmpty(q2) == 0 || nonEmpty(q3) == 0 || currentProcess != NULL) {
     while (d->front != NULL && d->front->process->arrival <= timer) {
-      node = d->front;
-      dequeue(d);
+      node = dequeue(d);
       switch (node->process->priority) {
         case 0: enqueue(s, node->process); break;
         case 1: enqueue(q1, node->process); break;
@@ -130,29 +129,30 @@ int main(int argc, char *argv[]) {
         sleep(1);
       }
     } else if (currentProcess == NULL) {
+      Node *temp = NULL;
       if (nonEmpty(s) == 0) {
-        currentProcess = s->front->process;
-        dequeue(s);
+        temp = dequeue(s);
+        currentProcess = temp->process;
         startProcess(currentProcess);
         sleep(1);
         timer++;
       } else if (nonEmpty(q1) == 0) {
-        currentProcess = q1->front->process;
         // printf("current process time %d\n", currentProcess->ptime);
-        dequeue(q1);
+        temp = dequeue(q1);
+        currentProcess = temp->process;
         startProcess(currentProcess);
         sleep(1);
         timer++;
       } else if (nonEmpty(q2) == 0) {
-        currentProcess = q2->front->process;
         // printf("current process time in q2 %d\n", currentProcess->ptime);
-        dequeue(q2);
+        temp = dequeue(q2);
+        currentProcess = temp->process;
         startProcess(currentProcess);
         sleep(1);
         timer++;
       } else if (nonEmpty(q3) == 0) {
-        currentProcess = q3->front->process;
-        dequeue(q3);
+        temp = dequeue(q3);
+        currentProcess = temp->process;
         startProcess(currentProcess);
         sleep(1);
         timer++;
