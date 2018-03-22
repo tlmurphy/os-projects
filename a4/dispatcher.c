@@ -13,18 +13,15 @@
 
 int timer = 0;
 
-void terminateProcess(Queue *q, Process *p) {
-  dequeue(q);
+void terminateProcess(Process *p) {
+  int status;
   kill(p->pid, SIGINT);
+  waitpid(p->pid, &status, WUNTRACED);
 }
 
-void suspendProcess(Queue *q, Queue *qLower, Process *p) {
-  if (p->priority < 3)
-    p->priority++;
-  dequeue(q);
-  enqueue(qLower, p);
-  kill(p->pid, SIGTSTP);
+void suspendProcess(Process *p) {
   int status;
+  kill(p->pid, SIGTSTP);
   waitpid(p->pid, &status, WUNTRACED);
 }
 
@@ -32,49 +29,36 @@ void restartProcess(Process *p) {
   kill(p->pid, SIGCONT);
 }
 
-void startProcess(Queue *q, Queue *qLower, Process *p) {
-  if (p->pid != 0) {
-    if (p->ptime == 0) {
-      terminateProcess(q, p);
-    } else {
-      restartProcess(p);
-    }
-    printf("time left: %d\n", p->ptime);
-    p->ptime--;
-    return;
-  }
-  pid_t pid;
-  pid = fork();
-  p->pid = pid;
-  if (pid < 0) {
-    fprintf(stderr, "Fork Failed!\n");
-    exit(EXIT_FAILURE);
-  } else if (pid == 0) {
-    char *args[3] = {NULL};
-    char ptime[50];
-    sprintf(ptime, "%d", p->ptime);
-    printf("p->time: %d\n", p->ptime);
-    args[0] = "./process";
-    args[1] = ptime;
-    int error = execvp(args[0], args);
-    if (error == -1) {
-      puts("process command has failed, exiting");
-      exit(EXIT_FAILURE); // Need to exit child if command is a failure
-    }
-  } else {
-    if (p->priority == 0) {
-      sleep(p->ptime);
-      terminateProcess(q, p);
-    } else {
-      sleep(1);
-      if (p->ptime == 0) {
-        terminateProcess(q, p);
-      } else {
-        suspendProcess(q, qLower, p);
+void startProcess(Process *p) {
+  if (p->pid == 0) {
+    pid_t pid;
+    pid = fork();
+    p->pid = pid;
+    if (pid < 0) {
+      fprintf(stderr, "Fork Failed!\n");
+      exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+      char *args[3] = {NULL};
+      char ptime[50];
+      sprintf(ptime, "%d", p->ptime);
+      args[0] = "./process";
+      args[1] = ptime;
+      int error = execvp(args[0], NULL);
+      if (error == -1) {
+        puts("process command has failed, exiting");
+        exit(EXIT_FAILURE); // Need to exit child if command is a failure
       }
     }
-    p->ptime--;
+  } else {
+    restartProcess(p);
   }
+}
+
+int nonEmpty(Queue *q) {
+  if (q->front != NULL)
+    return 0;
+  else
+    return -1;
 }
 
 int main(int argc, char *argv[]) {
@@ -110,72 +94,70 @@ int main(int argc, char *argv[]) {
   if (line)
     free(line);
 
-  // Go through dispatch queue
-  Node *iter = d->front;
-	while (iter != NULL) {
-    Process *p = iter->process;
-		if (p->arrival == timer) {
-      switch (p->priority) {
-        case 0: enqueue(s, p); break;
-        case 1: enqueue(q1, p); break;
-        case 2: enqueue(q2, p); break;
-        case 3: enqueue(q3, p); break;
+  Process *currentProcess = NULL;
+  Node *node = NULL;
+  while (nonEmpty(d) == 0 || nonEmpty(s) == 0 || nonEmpty(q1) == 0 || nonEmpty(q2) == 0 || nonEmpty(q3) == 0 || currentProcess != NULL) {
+    while (d->front != NULL && d->front->process->arrival <= timer) {
+      node = dequeue(d);
+      switch (node->process->priority) {
+        case 0: enqueue(s, node->process); break;
+        case 1: enqueue(q1, node->process); break;
+        case 2: enqueue(q2, node->process); break;
+        case 3: enqueue(q3, node->process); break;
       }
-      iter = iter->next;
-    } else {
-      // Go through all the queues and run the processes in them
-      Node *sIter = s->front;
-      Node *q1Iter = q1->front;
-      Node *q2Iter = q2->front;
-      Node *q3Iter = q3->front;
-      while (sIter != NULL) {
-        startProcess(s, s, sIter->process);
-        sIter = sIter->next;
+      node = NULL;
+    }
+    if (currentProcess != NULL) {
+      // printf("current process time %d\n", currentProcess->ptime);
+      currentProcess->ptime--;
+      if (currentProcess->ptime <= 0) {
+        terminateProcess(currentProcess);
+        currentProcess = NULL;
+      } else if (nonEmpty(s) == 0 || nonEmpty(q1) == 0 || nonEmpty(q2) == 0 || nonEmpty(q3) == 0) {
+        suspendProcess(currentProcess);
+        if (currentProcess->priority < 3) {
+          currentProcess->priority++;
+          switch (currentProcess->priority) {
+            case 2: enqueue(q2, currentProcess); break;
+            case 3: enqueue(q3, currentProcess); break;
+          }
+        }
+        currentProcess = NULL;
+      } else {
+        // Nothing in the rest of the queues, so just continue with current process
+        printf("did this happend??\n");
+        sleep(1);
       }
-      while (q1Iter != NULL) {
-        startProcess(q1, q2, q1Iter->process);
-        q1Iter = q1Iter->next;
+    } else if (currentProcess == NULL) {
+      Node *temp = NULL;
+      if (nonEmpty(s) == 0) {
+        temp = dequeue(s);
+        currentProcess = temp->process;
+        startProcess(currentProcess);
+        sleep(1);
+        timer++;
+      } else if (nonEmpty(q1) == 0) {
+        // printf("current process time %d\n", currentProcess->ptime);
+        temp = dequeue(q1);
+        currentProcess = temp->process;
+        startProcess(currentProcess);
+        sleep(1);
+        timer++;
+      } else if (nonEmpty(q2) == 0) {
+        // printf("current process time in q2 %d\n", currentProcess->ptime);
+        temp = dequeue(q2);
+        currentProcess = temp->process;
+        startProcess(currentProcess);
+        sleep(1);
+        timer++;
+      } else if (nonEmpty(q3) == 0) {
+        temp = dequeue(q3);
+        currentProcess = temp->process;
+        startProcess(currentProcess);
+        sleep(1);
+        timer++;
       }
-      while (q2Iter != NULL) {
-        startProcess(q2, q3, q2Iter->process);
-        q2Iter = q2Iter->next;
-      }
-      while (q3Iter != NULL) {
-        startProcess(q3, q3, q3Iter->process);
-        q3Iter = q3Iter->next;
-      }
-      timer++;
-    }
-	}
-
-  // Go through all the queues and run the processes in them again...
-  Node *sIter = s->front;
-  Node *q1Iter = q1->front;
-  Node *q2Iter = q2->front;
-  Node *q3Iter = q3->front;
-  while(sIter != NULL || q1Iter != NULL || q2Iter != NULL || q3Iter != NULL) {
-    while (sIter != NULL) {
-      startProcess(s, s, sIter->process);
-      sIter = sIter->next;
-    }
-    while (q1Iter != NULL) {
-      startProcess(q1, q2, q1Iter->process);
-      q1Iter = q1Iter->next;
-    }
-    while (q2Iter != NULL) {
-      startProcess(q2, q3, q2Iter->process);
-      q2Iter = q2Iter->next;
-    }
-    while (q3Iter != NULL) {
-      startProcess(q3, q3, q3Iter->process);
-      q3Iter = q3Iter->next;
-    }
-    // Reset these pointers since a process could be enqueued onto these queues.
-    if (q2Iter == NULL || q3Iter == NULL) {
-      q2Iter = q2->front;
-      q3Iter = q3->front;
     }
   }
-
   exit(EXIT_SUCCESS);
 }

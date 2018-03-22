@@ -10,7 +10,7 @@ typedef struct QueueObject {
 
 extern Queue *newQueue();
 extern void enqueue(Queue *q,  Process *p);
-extern void dequeue(Queue *q);
+extern Node *dequeue(Queue *q);
 extern void printQueue(Queue *q);
 
 #endif /* QUEUE_H */
