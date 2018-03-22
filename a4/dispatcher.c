@@ -29,7 +29,7 @@ void suspendProcess(Queue *q, Queue *qLower, Process *p) {
 }
 
 void restartProcess(Process *p) {
-  kill(p->pid, SIGINT);
+  kill(p->pid, SIGCONT);
 }
 
 void startProcess(Queue *q, Queue *qLower, Process *p) {
