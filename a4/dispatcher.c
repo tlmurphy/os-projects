@@ -31,13 +31,13 @@ void restartProcess(Process *p) {
 
 void startProcess(Process *p) {
   if (p->pid == 0) {
-    pid_t pid;
-    pid = fork();
-    p->pid = pid;
-    if (pid < 0) {
+    // pid_t pid;
+    // pid = fork();
+    p->pid = fork();
+    if (p->pid < 0) {
       fprintf(stderr, "Fork Failed!\n");
       exit(EXIT_FAILURE);
-    } else if (pid == 0) {
+    } else if (p->pid == 0) {
       char *args[3] = {NULL};
       char ptime[50];
       sprintf(ptime, "%d", p->ptime);
@@ -125,7 +125,8 @@ int main(int argc, char *argv[]) {
         currentProcess = NULL;
       } else {
         // Nothing in the rest of the queues, so just continue with current process
-        printf("did this happend??\n");
+        suspendProcess(currentProcess);
+        startProcess(currentProcess);
         sleep(1);
       }
     } else if (currentProcess == NULL) {
