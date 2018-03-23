@@ -31,8 +31,6 @@ void restartProcess(Process *p) {
 
 void startProcess(Process *p) {
   if (p->pid == 0) {
-    // pid_t pid;
-    // pid = fork();
     p->pid = fork();
     if (p->pid < 0) {
       fprintf(stderr, "Fork Failed!\n");
@@ -52,13 +50,6 @@ void startProcess(Process *p) {
   } else {
     restartProcess(p);
   }
-}
-
-int nonEmpty(Queue *q) {
-  if (q->front != NULL)
-    return 0;
-  else
-    return -1;
 }
 
 int main(int argc, char *argv[]) {
@@ -87,7 +78,7 @@ int main(int argc, char *argv[]) {
     int ptime = atoi(token);
     token = strtok(NULL, ",");
     Process *p = newProcess(arrival, priority, ptime);
-    enqueue(d, p);
+    sortedEnqueue(d, p);
     token = strtok(NULL, ",");
   }
   fclose(fp);
