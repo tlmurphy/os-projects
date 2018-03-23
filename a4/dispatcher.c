@@ -41,7 +41,7 @@ void startProcess(Process *p) {
       sprintf(ptime, "%d", p->ptime);
       args[0] = "./process";
       args[1] = ptime;
-      int error = execvp(args[0], NULL);
+      int error = execvp(args[0], args);
       if (error == -1) {
         puts("process command has failed, exiting");
         exit(EXIT_FAILURE); // Need to exit child if command is a failure
