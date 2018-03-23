@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
   size_t len = 0;
   ssize_t read;
 
-  fp = fopen("sampleInput.txt", "r");
+  fp = fopen(argv[1], "r");
   if (fp == NULL)
     exit(EXIT_FAILURE);
 
@@ -108,15 +108,16 @@ int main(int argc, char *argv[]) {
       node = NULL;
     }
     if (currentProcess != NULL) {
-      // printf("current process time %d\n", currentProcess->ptime);
       currentProcess->ptime--;
       if (currentProcess->ptime <= 0) {
         terminateProcess(currentProcess);
         currentProcess = NULL;
       } else if (nonEmpty(s) == 0 || nonEmpty(q1) == 0 || nonEmpty(q2) == 0 || nonEmpty(q3) == 0) {
         suspendProcess(currentProcess);
-        if (currentProcess->priority < 3) {
-          currentProcess->priority++;
+        if (currentProcess->priority <= 3) {
+          if (currentProcess->priority < 3) {
+            currentProcess->priority++;
+          }
           switch (currentProcess->priority) {
             case 2: enqueue(q2, currentProcess); break;
             case 3: enqueue(q3, currentProcess); break;
@@ -135,17 +136,18 @@ int main(int argc, char *argv[]) {
         temp = dequeue(s);
         currentProcess = temp->process;
         startProcess(currentProcess);
-        sleep(1);
-        timer++;
+        // Since system process, run until completion then set current process to none
+        sleep(currentProcess->ptime);
+        timer = timer + currentProcess->ptime;
+        terminateProcess(currentProcess);
+        currentProcess = NULL;
       } else if (nonEmpty(q1) == 0) {
-        // printf("current process time %d\n", currentProcess->ptime);
         temp = dequeue(q1);
         currentProcess = temp->process;
         startProcess(currentProcess);
         sleep(1);
         timer++;
       } else if (nonEmpty(q2) == 0) {
-        // printf("current process time in q2 %d\n", currentProcess->ptime);
         temp = dequeue(q2);
         currentProcess = temp->process;
         startProcess(currentProcess);
@@ -156,6 +158,8 @@ int main(int argc, char *argv[]) {
         currentProcess = temp->process;
         startProcess(currentProcess);
         sleep(1);
+        timer++;
+      } else {
         timer++;
       }
     }
