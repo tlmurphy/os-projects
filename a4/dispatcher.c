@@ -11,7 +11,7 @@
 #include "Queue.h"
 #include "Process.h"
 
-int timer = 0;
+int timer = 0; // Global timer for processes
 
 void terminateProcess(Process *p) {
   int status;
@@ -30,6 +30,7 @@ void restartProcess(Process *p) {
 }
 
 void startProcess(Process *p) {
+  // Check if process hasn't started yet; if it has, just restart it
   if (p->pid == 0) {
     p->pid = fork();
     if (p->pid < 0) {
@@ -57,6 +58,13 @@ int main(int argc, char *argv[]) {
     puts("Please provide the input file as the argument!");
     exit(EXIT_FAILURE);
   }
+  /**
+   * d  -> dispatcher input queue
+   * s  -> system process queue
+   * q1 -> priority 1 process queue
+   * q2 -> priority 2 process queue
+   * q3 -> priority 3 process queue
+   */
   Queue *d = newQueue(), *s = newQueue(), *q1 = newQueue(), *q2 = newQueue(), *q3 = newQueue();
   FILE *fp;
   char *line = NULL;
@@ -88,6 +96,7 @@ int main(int argc, char *argv[]) {
   Process *currentProcess = NULL;
   Node *node = NULL;
   while (nonEmpty(d) == 0 || nonEmpty(s) == 0 || nonEmpty(q1) == 0 || nonEmpty(q2) == 0 || nonEmpty(q3) == 0 || currentProcess != NULL) {
+    // Go through dispatch queue and add processes to their appropriate priority queue
     while (d->front != NULL && d->front->process->arrival <= timer) {
       node = dequeue(d);
       switch (node->process->priority) {
@@ -123,6 +132,7 @@ int main(int argc, char *argv[]) {
       }
     } else if (currentProcess == NULL) {
       Node *temp = NULL;
+      // This if-else structure ensures we handle the highest priority processes first
       if (nonEmpty(s) == 0) {
         temp = dequeue(s);
         currentProcess = temp->process;
