@@ -1,11 +1,11 @@
 CC=gcc
 CFLAGS=-Wall -g
 
-vmm: vmm.c
-	$(CC) $(CFLAGS) vmm.c
+fifo: fifo.c
+	$(CC) -o fifo $(CFLAGS) fifo.c
 
-modification: modification.c
-	$(CC) $(CFLAGS) modification.c
+lru: lru.c
+	$(CC) -o lru $(CFLAGS) lru.c
 
 clean:
-	$(RM) -rf a.out *.dSYM/
+	$(RM) -rf fifo lru *.dSYM/
